@@ -5,7 +5,10 @@ from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
+from wtform_fields import *
+
 app = Flask(__name__)
+app.secret_key = 'CHANGE-LATER'
 
 # Check for environment variable - harvard starter project 1
 if not os.getenv("DATABASE_URL"):
@@ -23,7 +26,10 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    return render_template("index.html")
+    reg_form = RegistrationForm()
+    if reg_form.validate_on_submit():
+        return "Welcome to the club! Registration successful."
+    return render_template("index.html", form=reg_form)
 
 @app.route("/search", methods=['GET', 'POST'])
 def search():
