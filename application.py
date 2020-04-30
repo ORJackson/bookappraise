@@ -1,8 +1,6 @@
 import os
 
-from flask import Flask, render_template
-#the following imports came from - harvard starter project 1 (not written by me)
-from flask import Flask, session
+from flask import Flask, session, render_template
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -23,12 +21,20 @@ engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def index():
     return render_template("index.html")
 
+@app.route("/search", methods=['GET', 'POST'])
+def search():
+    return render_template("search.html")
 
-@app.route("/<string:name>")
-def hello(name):
-    name = name.capitalize()
-    return f"Hello, {name}!"
+
+# @app.route("/<string:name>")
+# def hello(name):
+#     name = name.capitalize()
+#     return f"Hello, {name}!"
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
