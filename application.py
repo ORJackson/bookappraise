@@ -29,6 +29,10 @@ def index():
 def search():
     return render_template("search.html")
 
+@app.route("/logout", methods=['GET', 'POST'])
+def logout():
+    return render_template("logout.html")
+
 
 # @app.route("/<string:name>")
 # def hello(name):
