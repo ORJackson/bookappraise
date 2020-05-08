@@ -39,9 +39,9 @@ def index():
         password = reg_form.password.data
 
         #check if username already exists
-        user_object = User.query.filter_by(username=username).first()
-        if user_object:
-            return "This username is already taken."
+        # user_object = User.query.filter_by(username=username).first()
+        # if user_object:
+        #     return "This username is already taken."
 
         #but if username is available.... (first value is name of the column, second value is the user input from the form)
         #Add the user to the DB...
