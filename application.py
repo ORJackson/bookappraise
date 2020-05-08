@@ -17,18 +17,18 @@ app.config['SQLALCHEMY_DATABASE_URI']= 'postgres://xoikhwtplbrmgh:7f40ed19a11bc1
 db = SQLAlchemy(app)
 
 
-# Check for environment variable - harvard starter project 1
+# Check for environment variable - provided in harvard starter code project 1
 if not os.getenv("DATABASE_URL"):
     raise RuntimeError("DATABASE_URL is not set")
 
-# Configure session to use filesystem - harvard starter project 1
+# Configure session to use filesystem - provided in harvard starter code project 1
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# Set up database - harvard starter project 1
-engine = create_engine(os.getenv("DATABASE_URL"))
-db = scoped_session(sessionmaker(bind=engine))
+# Set up database - provided in harvard starter code project 1 - CAUSES ERROR, CONFLICTS WITH LINE 16/17 (I think)
+# engine = create_engine(os.getenv("DATABASE_URL"))
+# db = scoped_session(sessionmaker(bind=engine))
 
 
 @app.route("/", methods=['GET', 'POST'])
