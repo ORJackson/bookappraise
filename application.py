@@ -37,14 +37,8 @@ def index():
     if reg_form.validate_on_submit():
         username = reg_form.username.data
         password = reg_form.password.data
-
-        #check if username already exists
-        # user_object = User.query.filter_by(username=username).first()
-        # if user_object:
-        #     return "This username is already taken."
-
-        #but if username is available.... (first value is name of the column, second value is the user input from the form)
-        #Add the user to the DB...
+        
+        #Add the user to the DB... (first value is name of the column, second value is the user input from the form)
         user = User(username=username, password=password)
         db.session.add(user)
         db.session.commit()
