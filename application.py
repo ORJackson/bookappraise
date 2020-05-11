@@ -4,6 +4,7 @@ from flask import Flask, session, render_template, redirect, url_for
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+from flask_login import LoginManager, login_user, current_user, logout_user
 
 from wtform_fields import *
 from models import *
@@ -15,7 +16,6 @@ app.secret_key = 'CHANGE-LATER'
 # Configure database - THIS IS NOT VERY SECURE TO LEAVE DB INFO HERE
 app.config['SQLALCHEMY_DATABASE_URI']= 'postgres://xoikhwtplbrmgh:7f40ed19a11bc14c9c1592561e6e220cf3006af8a3202cef51381ee4b49f2462@ec2-54-217-204-34.eu-west-1.compute.amazonaws.com:5432/d2tja8a5tiraod'
 db = SQLAlchemy(app)
-
 
 # Check for environment variable - provided in harvard starter code project 1
 if not os.getenv("DATABASE_URL"):
@@ -30,6 +30,13 @@ Session(app)
 # engine = create_engine(os.getenv("DATABASE_URL"))
 # db = scoped_session(sessionmaker(bind=engine))
 
+# Configure flask login
+login = LoginManager(app)
+login.init_app(app)
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -59,16 +66,23 @@ def login():
 
     #Allow login if validation is successful
     if login_form.validate_on_submit():
-        return "Logged in!"
-    
+        user_object = User.query.filter_by(username=login_form.username.data).first()
+        login_user(user_object)
+        return redirect(url_for('search'))
+       
     return render_template("login.html", form=login_form)
 
 @app.route("/search", methods=['GET', 'POST'])
 def search():
+
+    if not current_user.is_authenticated:
+        return render_template("please_login.html")
+    
     return render_template("search.html")
 
-@app.route("/logout", methods=['GET', 'POST'])
+@app.route("/logout", methods=['GET'])
 def logout():
+    logout_user()
     return render_template("logout.html")
 
 
