@@ -10,11 +10,11 @@ def invalid_credentials(form, field):
     password_entered = field.data
 
     #check if username exists and the password matches
-    user_object = User.query.filter_by(username=username.data).first()
-        if user_object is None:
-            raise ValidationError("Username or password is incorrect")
-        elif password_entered != user_object.password:
-            raise ValidationError("Username or password is incorrect")
+    user_object = User.query.filter_by(username=username_entered).first()
+    if user_object is None:
+        raise ValidationError("Username or password is incorrect")
+    elif password_entered != user_object.password:
+        raise ValidationError("Username or password is incorrect")
 
 
 class RegistrationForm(FlaskForm):
@@ -31,6 +31,6 @@ class RegistrationForm(FlaskForm):
         
 class LoginForm(FlaskForm):
     """ Login Form """
-    username = StringField('username_label'), validators=[InputRequired(message="Username required")])
-    password = StringField('password_label', validators=[InputRequired(message="Password required"), invalid_credentials])
+    username = StringField('username_label', validators=[InputRequired(message="Username required")])
+    password = PasswordField('password_label', validators=[InputRequired(message="Password required"), invalid_credentials])
     submit_button = SubmitField('Login')

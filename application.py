@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session, render_template
+from flask import Flask, session, render_template, redirect, url_for
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -34,6 +34,8 @@ Session(app)
 @app.route("/", methods=['GET', 'POST'])
 def index():
     reg_form = RegistrationForm()
+
+    #if the validation is successful updates the database
     if reg_form.validate_on_submit():
         username = reg_form.username.data
         password = reg_form.password.data
@@ -42,9 +44,21 @@ def index():
         user = User(username=username, password=password)
         db.session.add(user)
         db.session.commit()
-        return "Inserted into DB!"
-        return "Welcome to the club! Registration successful."
+
+        return redirect(url_for('login'))
+
     return render_template("index.html", form=reg_form)
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    
+    login_form = LoginForm()
+
+    #Allow login if validation is successful
+    if login_form.validate_on_submit():
+        return "Logged in!"
+    
+    return render_template("login.html", form=login_form)
 
 @app.route("/search", methods=['GET', 'POST'])
 def search():
