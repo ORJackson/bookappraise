@@ -39,9 +39,12 @@ def index():
     if reg_form.validate_on_submit():
         username = reg_form.username.data
         password = reg_form.password.data
+
+        #Hash password
+        hashed_password = pbkdf2_sha256.hash(password)
         
         #Add the user to the DB... (first value is name of the column, second value is the user input from the form)
-        user = User(username=username, password=password)
+        user = User(username=username, password=hashed_password)
         db.session.add(user)
         db.session.commit()
 
@@ -51,7 +54,7 @@ def index():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    
+
     login_form = LoginForm()
 
     #Allow login if validation is successful
