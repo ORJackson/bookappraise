@@ -5,3 +5,4 @@ SQLAlchemy
 Werkzeug 0.16.0
 passlib
 flask_login
+python-dotenv

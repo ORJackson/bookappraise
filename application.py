@@ -11,11 +11,15 @@ from models import *
 
 # Configure app
 app = Flask(__name__)
-app.secret_key = 'CHANGE-LATER'
+app.secret_key = os.getenv('SECRET_KEY', None)
 
-# Configure database - THIS IS NOT VERY SECURE TO LEAVE DB INFO HERE
-app.config['SQLALCHEMY_DATABASE_URI']= 'postgres://xoikhwtplbrmgh:7f40ed19a11bc14c9c1592561e6e220cf3006af8a3202cef51381ee4b49f2462@ec2-54-217-204-34.eu-west-1.compute.amazonaws.com:5432/d2tja8a5tiraod'
+# Configure database
+app.config['SQLALCHEMY_DATABASE_URI']= os.getenv('SQLALCHEMY_DATABASE_URI')
 db = SQLAlchemy(app)
+
+# Set up database - provided in harvard starter code project 1 - CAUSES ERROR
+# engine = create_engine(os.getenv("DATABASE_URL"))
+# db = scoped_session(sessionmaker(bind=engine))
 
 # Check for environment variable - provided in harvard starter code project 1
 if not os.getenv("DATABASE_URL"):
@@ -25,10 +29,6 @@ if not os.getenv("DATABASE_URL"):
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-
-# Set up database - provided in harvard starter code project 1 - CAUSES ERROR, CONFLICTS WITH LINE 16/17 (I think)
-# engine = create_engine(os.getenv("DATABASE_URL"))
-# db = scoped_session(sessionmaker(bind=engine))
 
 # Configure flask login
 login = LoginManager(app)
@@ -82,6 +82,10 @@ def search():
 
 @app.route("/logout", methods=['GET'])
 def logout():
+
+    if not current_user.is_authenticated:
+        return render_template("please_login.html")
+
     logout_user()
     return render_template("logout.html")
 
@@ -93,4 +97,3 @@ def logout():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
