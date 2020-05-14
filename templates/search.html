@@ -1,7 +1,37 @@
+{% from "form_helper.html" import displayField %}
+
 {% extends "layout.html" %}
 
 {% block title %} Search {% endblock %}
 
 {% block content %}
     <h2>Let's get searching</h2>
+
+    <form method="POST">
+        <p>
+        {{ displayField(form.search, "Search here")}}
+        </p>
+        <p><input type="submit" value="Search">
+        </p>
+    </form>
+
+
+    <!-- Not using WTForms -->
+    <!-- <h1><center>Library</center></h1>
+        <form class="search" method="post" action="" 
+         style="margin:auto;max-width:600px">
+            <input type="text" placeholder="Search by author, 
+             title, ISBN, or all to see all the data" name="books">
+            <button type="submit"><i class="fa fa-search"></i>
+            </button>
+        </form>
+        <p></p>
+        <center>
+        {% for item in data %}
+            <tr>
+                <td> {{item[0]}} by {{item[1]}}</td>
+                </br>
+            </tr>
+        {% endfor %}
+        </center> -->
 {% endblock %}

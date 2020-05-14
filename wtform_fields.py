@@ -35,3 +35,8 @@ class LoginForm(FlaskForm):
     username = StringField('username_label', validators=[InputRequired(message="Username required")])
     password = PasswordField('password_label', validators=[InputRequired(message="Password required"), invalid_credentials])
     submit_button = SubmitField('Login')
+
+class BookSearchForm(FlaskForm):
+    """Book Search Form"""
+    search = StringField('')
+    # submit_button = SubmitField('Search')

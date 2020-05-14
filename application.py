@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session, render_template, redirect, url_for
+from flask import Flask, session, render_template, redirect, url_for, request, flash
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -9,6 +9,7 @@ from flask_login import LoginManager, login_user, current_user, logout_user
 from wtform_fields import *
 from models import *
 
+# secret_key and database info stored in .env
 # Configure app
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', None)
@@ -72,13 +73,35 @@ def login():
        
     return render_template("login.html", form=login_form)
 
+
 @app.route("/search", methods=['GET', 'POST'])
 def search():
-
+    search = BookSearchForm(request.form)
     if not current_user.is_authenticated:
         return render_template("please_login.html")
     
-    return render_template("search.html")
+    if request.method == 'POST':
+        return search_results(search)
+
+    return render_template("search.html", form=search)
+
+# from: https://www.blog.pythonlibrary.org/2017/12/13/flask-101-how-to-add-a-search-form/
+# Not sure about this....
+@app.route('/results')
+def search_results(search):
+    results = []
+    search_string = search.data['search']
+    if search.data['search'] == '':
+        qry = db_session.query(Book)
+        results = qry.all()
+    if not results:
+        flash('No results found!')
+        return redirect('/search')
+    else:
+        # display results
+        return render_template('results.html', results=results)
+
+
 
 @app.route("/logout", methods=['GET'])
 def logout():
