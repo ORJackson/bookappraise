@@ -8,6 +8,7 @@ from flask_login import LoginManager, login_user, current_user, logout_user
 
 from wtform_fields import *
 from models import *
+from tables import Results
 
 # secret_key and database info stored in .env
 # Configure app
@@ -17,6 +18,9 @@ app.secret_key = os.getenv('SECRET_KEY', None)
 # Configure database
 app.config['SQLALCHEMY_DATABASE_URI']= os.getenv('SQLALCHEMY_DATABASE_URI')
 db = SQLAlchemy(app)
+
+engine = create_engine(os.getenv("DATABASE_URL"))
+db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 # Set up database - provided in harvard starter code project 1 - CAUSES ERROR
 # engine = create_engine(os.getenv("DATABASE_URL"))
@@ -35,9 +39,11 @@ Session(app)
 login = LoginManager(app)
 login.init_app(app)
 
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -59,6 +65,7 @@ def index():
         return redirect(url_for('login'))
 
     return render_template("index.html", form=reg_form)
+
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -85,22 +92,28 @@ def search():
 
     return render_template("search.html", form=search)
 
-# from: https://www.blog.pythonlibrary.org/2017/12/13/flask-101-how-to-add-a-search-form/
-# Not sure about this....
+
 @app.route('/results')
 def search_results(search):
     results = []
-    search_string = search.data['search']
-    if search.data['search'] == '':
+    search_string = search.data['search'].capitalize()
+
+    if search_string:
+        qry = db_session.query(Book).filter((Book.title.contains(search_string)) | (Book.author.contains(search_string)) | (Book.year.contains(search_string)) | (Book.isbn.contains(search_string)))
+        results = qry.all()
+
+    else:
         qry = db_session.query(Book)
         results = qry.all()
+        
     if not results:
         flash('No results found!')
         return redirect('/search')
     else:
         # display results
-        return render_template('results.html', results=results)
-
+        table = Results(results)
+        table.border = True
+        return render_template('results.html', table=table)
 
 
 @app.route("/logout", methods=['GET'])
@@ -112,11 +125,6 @@ def logout():
     logout_user()
     return render_template("logout.html")
 
-
-# @app.route("/<string:name>")
-# def hello(name):
-#     name = name.capitalize()
-#     return f"Hello, {name}!"
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, Form
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
 from passlib.hash import pbkdf2_sha256
 from models import User
@@ -36,7 +36,7 @@ class LoginForm(FlaskForm):
     password = PasswordField('password_label', validators=[InputRequired(message="Password required"), invalid_credentials])
     submit_button = SubmitField('Login')
 
-class BookSearchForm(FlaskForm):
+class BookSearchForm(Form):
     """Book Search Form"""
     search = StringField('')
     # submit_button = SubmitField('Search')

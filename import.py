@@ -31,7 +31,7 @@ def main():
                 {"isbn": isbn, "title": title, "author": author, "year": year},
             )
             # Just for fun...
-            print(f"Added book {title} to database.")
+            # print(f"Added book {title} to database.")
         db.commit()
 
 if __name__ == "__main__":
