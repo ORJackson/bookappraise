@@ -10,6 +10,8 @@ from wtform_fields import *
 from models import *
 from tables import Results
 
+import string
+
 # secret_key and database info stored in .env
 # Configure app
 app = Flask(__name__)
@@ -96,11 +98,11 @@ def search():
 @app.route('/results')
 def search_results(search):
     results = []
-    search_string = search.data['search'].capitalize()
+    search_string = string.capwords(search.data['search'], sep = None)
 
     if search_string:
         qry = db_session.query(Book).filter((Book.title.contains(search_string)) | (Book.author.contains(search_string)) | (Book.year.contains(search_string)) | (Book.isbn.contains(search_string)))
-        results = qry.all()
+        results = qry.order_by(Book.author.asc()).all()
 
     else:
         qry = db_session.query(Book)
