@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %} 
+
+Book Info: {{book_info['title']}}
+
+
+{% endblock %}
+
+{% block content %}
+    <h2>{{book_info['title']}}</h2>
+    <h3>{{book_info['author']}}</h3>
+    <h3>{{book_info['year']}}</h3>
+    <h3>ISBN: {{book_info['isbn']}}</h3>
+    <h4>Goodreads Info:</h4>
+    <!-- Fix this... -->
+    <div>Ratings count: {{ review_data['books']['ratings_count'] }}</div>   
+    <div>{{review_data}}</div>
+{% endblock %}
+
+
+
