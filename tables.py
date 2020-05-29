@@ -1,6 +1,8 @@
 from flask_table import Table, Col, LinkCol
 from models import Book
 
+# Table for displaying search results
+
 class Results(Table):
     id = Col('Id', show=False)
     isbn = Col('ISBN')

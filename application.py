@@ -69,7 +69,8 @@ def index():
         # db.session.add(user)
         # db.session.commit()
 
-        db.session.execute("INSERT INTO users (username, password) VALUES (:username, :password)", {"username": username, "password" : hashed_password})
+        db.session.execute("INSERT INTO users (username, password) VALUES (:username, :password)",\
+             {"username": username, "password" : hashed_password})
         db.session.commit()
 
         return redirect(url_for('login'))
@@ -92,7 +93,8 @@ def login():
     # username = login_form.username.data
        
     # if login_form.validate_on_submit():
-    #     user_object = db.session.execute("SELECT * FROM users WHERE username = :username", {"username": username}).fetchone()
+    #     user_object = db.session.execute("SELECT * FROM users WHERE username = :username",\
+    #  {"username": username}).fetchone()
     #     login_user(user_object)
     #     return redirect(url_for('search'))
 
@@ -117,11 +119,18 @@ def search_results(search):
     search_string = string.capwords(search.data['search'], sep = None)
 
     if search_string:
-        # qry = db_session.query(Book).filter((Book.title.contains(search_string)) | (Book.author.contains(search_string)) | (Book.year.contains(search_string)) | (Book.isbn.contains(search_string)))
-        # qry = db.session.query(Book).filter((Book.title.contains(search_string)) | (Book.author.contains(search_string)) | (Book.year.contains(search_string)) | (Book.isbn.contains(search_string)))
+        # qry = db_session.query(Book).filter((Book.title.contains(search_string)) | \
+        # (Book.author.contains(search_string)) | (Book.year.contains(search_string)) |\
+        #  (Book.isbn.contains(search_string)))
+        # qry = db.session.query(Book).filter((Book.title.contains(search_string)) |\
+        #  (Book.author.contains(search_string)) | (Book.year.contains(search_string)) |\
+        #  (Book.isbn.contains(search_string)))
         # results = qry.order_by(Book.author.asc()).all()
 
-        results = db.session.execute("SELECT isbn, author, title, year FROM books WHERE isbn iLIKE '%"+search_string+"%' OR author iLIKE '%"+search_string+"%' OR title iLIKE '%"+search_string+"%' OR year iLIKE '%"+search_string+"%' ORDER BY author").fetchall()
+        results = db.session.execute("SELECT isbn, author, title, year FROM books \
+            WHERE isbn iLIKE '%"+search_string+"%' OR author iLIKE '%"+search_string+"%'\
+                 OR title iLIKE '%"+search_string+"%' OR year iLIKE '%"+search_string+"%'\
+                      ORDER BY author").fetchall()
         # results = qry.order_by(Book.author.asc()).all() 
           
 
@@ -147,8 +156,12 @@ def search_results(search):
 #     else:
 #         return render_template("book.html")
 
-@app.route('/book/<isbn>', methods=['GET'])
+@app.route('/book/<isbn>', methods=['GET', 'POST'])
 def display_info(isbn):
+    review = BookReviewForm(request.form)
+    book_row = db.session.execute("SELECT id FROM books WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
+    book_id = book_row['id']
+
     if not current_user.is_authenticated:
         return render_template("please_login.html")
     else:
@@ -159,16 +172,59 @@ def display_info(isbn):
                             {"isbn": isbn})
             book_info = row.fetchone()
 
-            """USE GOODREADS API"""
+            """USE GOODREADS API to get average rating and rating count"""
 
             key = os.getenv('GOODREADS_API_KEY')
 
             res = requests.get("https://www.goodreads.com/book/review_counts.json", params = {"key" : key, "isbns": isbn})
+
             if res.status_code != 200:
                 return render_template("error.html", message="API request unsuccessful.")
+            
             review_data = res.json()
 
-            return render_template("book.html", book_info = book_info, review_data = review_data)
+            user_reviews = db.session.execute("SELECT * FROM reviews WHERE book_id = :book_id", {"book_id": book_id}).fetchall()
+
+            return render_template("book.html", book_info = book_info, review_data = review_data, res = res, form = review, user_reviews = user_reviews)
+
+        """post a review"""
+
+        if request.method == 'POST':
+            
+            user_id = current_user.id
+            comment = review.data['review']
+            
+            # for test purposes rating is declared as 5*
+            rating = 5
+
+            """Search for existing review by this user on this book"""
+
+            existing_review = db.session.execute("SELECT * FROM reviews WHERE user_id = :user_id AND book_id = :book_id",\
+                 {"user_id": user_id, "book_id": book_id}).fetchone()
+
+            if existing_review:
+
+                flash('You have already reviewed this book! You cannot post more than one review for the same book.')
+
+                return redirect('/book/' + isbn)
+
+            else:
+            
+                """If no review exists, post review"""
+
+                db.session.execute("INSERT INTO reviews (user_id, book_id, comment, rating, date) VALUES (:user_id, :book_id, :comment, :rating, CURRENT_DATE)", \
+                    {"user_id" : user_id, "book_id" : book_id, "comment" : comment, "rating" : rating})
+
+                db.session.commit()
+
+                flash('Thanks for the review!')
+
+                return redirect('/book/' + isbn)
+            
+
+            # return render_template("book.html", book_info = book_info, review_data = review_data, res = res, form = review)
+
+
         
 
 

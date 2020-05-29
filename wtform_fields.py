@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, Form
+from wtforms import StringField, PasswordField, SubmitField, Form, TextAreaField
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
 from passlib.hash import pbkdf2_sha256
 from models import User
@@ -24,7 +24,7 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField("confirm_password_label", validators=[InputRequired(message="Password required"), EqualTo('password', message="Passwords must match")])
     submit_button = SubmitField('Register')
 
-#Query database to check if another user has taken a specific username
+    #Query database to check if another user has taken a specific username
     def validate_username(self, username): 
         user_object = User.query.filter_by(username=username.data).first()
         if user_object:
@@ -40,3 +40,7 @@ class BookSearchForm(Form):
     """Book Search Form"""
     search = StringField('')
     # submit_button = SubmitField('Search')
+
+class BookReviewForm(Form):
+    """Review Form"""
+    review = TextAreaField('Text', render_kw={"rows": 5, "cols": 5}, validators=[InputRequired(message="Input required")])
