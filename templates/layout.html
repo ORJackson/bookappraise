@@ -12,14 +12,29 @@
             <div class="topnav">
                     <!-- <a class="active" href="index.html">bookAPPraise</a> -->
                     <a href="/">bookAPPraise</a>
-                    <a href="/search">search</a>
-                    <a href="/login">logIn</a>
-                    <a href="/logout">logOut</a>
-                    <a class="navbar-brand">Greetings {{session.username}}</a>
+                    {% if current_user.is_authenticated %}
+                        <a href="/search">search</a>
+                        <a href="/logout">logOut</a>
+                        <a class="user">{{current_user.username}}</a>
+                    {% else %}
+                        <a href="/login">logIn</a>
+                    {% endif %}
             </div>
         </nav>
-        {% block content %}
-        {% endblock %}
+        <div class="row">
+            <!-- enable "No results found message" to flash on screen -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-info text-center">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        <main class="container p-5">
+            {% block content %}
+            {% endblock %}
+        </main>
     </body>
 
 </html>

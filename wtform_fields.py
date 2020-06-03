@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, Form, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, Form, TextAreaField, SelectField
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
 from passlib.hash import pbkdf2_sha256
 from models import User
+
 
 def invalid_credentials(form, field):
     """ This function checks username and password """
@@ -44,3 +45,8 @@ class BookSearchForm(Form):
 class BookReviewForm(Form):
     """Review Form"""
     review = TextAreaField('Text', render_kw={"rows": 5, "cols": 5}, validators=[InputRequired(message="Input required")])
+    rating = SelectField('Rating', choices=[(5, 5), (4, 4), (3, 3), (2, 2), (1, 1)], validators=[InputRequired(message="You need to give the book a rating")])
+
+# class BookRatingForm(Form):
+#     """Select rating /5 Form - drop down"""
+#     rating = SelectField('Rating', choices=[(5, 5), (4, 4), (3, 3), (2, 2), (1, 1)])

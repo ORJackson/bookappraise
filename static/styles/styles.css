@@ -1,18 +1,18 @@
 /*Stylesheet*/
 body {
-  background-color: #ddd;
+  background-color: #FFFFFF;
 }
 
 /* styles the navigation bar */
 .topnav {
-  background-color: #333;
+  background-color: #553B08;
   overflow: hidden;
   opacity: 0.9;
 }
 
 .topnav a {
   float: left;
-  color: #ddd;
+  color: #FFFFFF;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -20,22 +20,12 @@ body {
 }
 
 .topnav a:hover {
-  background-color: #ddd;
-  color: black;
+  background-color: #FFFFFF;
+  color: #553B08;
 }
 
 .topnav a.active {
-  background-color: #ddd;
-  color: black;
-}
-
-.topnav a .navbar-brand {
-  float: right;
-  color: red;
-  background-color: red;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
+  background-color: #FFFFFF;
+  color: #553B08;
 }
 /*# sourceMappingURL=styles.css.map */

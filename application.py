@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session, render_template, redirect, url_for, request, flash
+from flask import Flask, session, render_template, redirect, url_for, request, flash, jsonify
 from flask_session import Session
 # from sqlalchemy import create_engine
 # from sqlalchemy.orm import scoped_session, sessionmaker
@@ -63,11 +63,6 @@ def index():
 
         #Hash password
         hashed_password = pbkdf2_sha256.hash(password)
-        
-        #Add the user to the DB... (first value is name of the column, second value is the user input from the form)
-        # user = User(username=username, password=hashed_password)
-        # db.session.add(user)
-        # db.session.commit()
 
         db.session.execute("INSERT INTO users (username, password) VALUES (:username, :password)",\
              {"username": username, "password" : hashed_password})
@@ -135,9 +130,6 @@ def search_results(search):
           
 
     else:
-        # qry = db_session.query(Book)
-        # qry = db.session.query(Book)
-        # results = qry.all()
         results = db.session.execute("SELECT * FROM books ORDER BY year")
         
     if not results:
@@ -149,12 +141,6 @@ def search_results(search):
         table.border = True
         return render_template('results.html', table=table)
 
-# @app.route('/book', methods=['GET'])
-# def display_info():
-#     if not current_user.is_authenticated:
-#         return render_template("please_login.html")
-#     else:
-#         return render_template("book.html")
 
 @app.route('/book/<isbn>', methods=['GET', 'POST'])
 def display_info(isbn):
@@ -183,7 +169,11 @@ def display_info(isbn):
             
             review_data = res.json()
 
-            user_reviews = db.session.execute("SELECT * FROM reviews WHERE book_id = :book_id", {"book_id": book_id}).fetchall()
+            """Query database for user reviews"""
+
+            user_reviews = db.session.execute("SELECT users.username, comment, rating, date FROM reviews \
+                INNER JOIN users ON reviews.user_id = users.id WHERE book_id = :book_id ORDER BY date DESC", \
+                    {"book_id": book_id}).fetchall()
 
             return render_template("book.html", book_info = book_info, review_data = review_data, res = res, form = review, user_reviews = user_reviews)
 
@@ -193,9 +183,7 @@ def display_info(isbn):
             
             user_id = current_user.id
             comment = review.data['review']
-            
-            # for test purposes rating is declared as 5*
-            rating = 5
+            rating = review.data['rating']
 
             """Search for existing review by this user on this book"""
 
@@ -220,14 +208,33 @@ def display_info(isbn):
                 flash('Thanks for the review!')
 
                 return redirect('/book/' + isbn)
+
+@app.route('/api/<isbn>', methods=['GET'])
+def display_book_json(isbn):
+
+    if not current_user.is_authenticated:
+        return render_template("please_login.html")
+    else:
+            """Display book info and bookAPPraise review data as a json"""
             
+            book_query = db.session.execute("SELECT books.title, books.author, books.year, books.isbn, \
+                COUNT(reviews.comment) AS review_count, ROUND(AVG(reviews.rating), 2) AS average_score \
+                    FROM reviews INNER JOIN books ON reviews.book_id = books.id WHERE books.isbn = :isbn \
+                        GROUP BY title, author, year, isbn", {"isbn": isbn}).fetchone()
+            
+            
+            book_dict = dict(book_query)
 
-            # return render_template("book.html", book_info = book_info, review_data = review_data, res = res, form = review)
+            book_dict['average_score'] = float(book_dict['average_score'])
 
+            book_json = jsonify(book_dict)
 
-        
+            if book_query:
+                return book_json
 
-
+            else:
+                return render_template("error.html", message="Uh oh! Error 404. No results found.")
+            
 
 @app.route("/logout", methods=['GET'])
 def logout():

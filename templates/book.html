@@ -10,47 +10,93 @@ Book Info: {{book_info['title']}}
 {% endblock %}
 
 {% block content %}
-    <h2>{{book_info['title']}}</h2>
-    <!-- <img src="http://covers.openlibrary.org/b/isbn/{{book_info['isbn']}}-s.jpg" alt="Book Cover"> -->
-    <h3>{{book_info['author']}}</h3>
-    <h4>Published: {{book_info['year']}}</h4>
-    <h4>ISBN: {{book_info['isbn']}}</h4>
-    <!-- <img src="https://s.gr-assets.com/assets/press/logo-9a67f27d0b265fc757056c08b87d6299.jpg" alt="Goodreads"> -->
-    <h4>Goodreads Info:</h4>
-    <div>Average rating: {{ review_data['books'][0]['average_rating'] }}/5 </div>
-    <div>From {{ review_data['books'][0]['work_ratings_count'] }} ratings</div>
-
-
+    
+<div class="row">
+    <div class="col-sm">
+        <img src="http://covers.openlibrary.org/b/isbn/{{book_info['isbn']}}-M.jpg" alt="Book Cover">
+    </div>
+    <div class="col-sm">
+        <h2>{{book_info['title']}}</h2>
+        <h3>{{book_info['author']}}</h3>
+        <h4>Published: {{book_info['year']}}</h4>
+        <h4>ISBN: {{book_info['isbn']}}</h4>
+    </div>
+    <div class="col-sm">
+        <div>Average rating: {{ review_data['books'][0]['average_rating'] }}/5 </div>
+        <div>From {{ review_data['books'][0]['work_ratings_count'] }} ratings</div>
+        <a href="https://www.goodreads.com/search?q={{book_info['title']}}"> 
+            <img src="https://s.gr-assets.com/assets/press/logo-9a67f27d0b265fc757056c08b87d6299.jpg" alt="Goodreads" class="img-fluid rounded" />
+        </a>
+    </div>
+    </div>
     <form method="POST">
-    <p>
-    {{ displayField(form.review, "Review the book here")}}
-    </p>
-    <p><input type="submit" value="Post your review!">
-    </p>
+        <div class="row">
+            <div class="col-12">
+                <p>
+                {{ displayField(form.review, "Review the book here")}}
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <p>
+                Rate the book: {{ displayField(form.rating, "Rate the book")}}
+                </p>
+                <p><input type="submit" value="Post your review!">
+                </p>
+            </div>
+        </div>
     </form>
+    
+  
 
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+    <div class ="row">
+        <div class ="col-12">
 
-    <h4>User reviews of this book:</h4>
-    {% for review in user_reviews %}
+            {% if user_reviews %}
 
-    <div>User: {{ review['user_id'] }}</div>
-    <div>Review: {{ review['comment'] }}</div>
+            <p>
+                <h4>User reviews of this book:</h4>
 
-    {% endfor %}
+                {% for book_review in user_reviews %}
+
+                <ul class ="list-group">
+                    <li class ="list-group-item ">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ book_review['username'] }}</h6>
+                            <small>Date: {{ book_review['date'] }} </small>
+                        </div>
+                        <p class="mb-1">{{ book_review['comment'] }}</p>
+                        <small>Rating: {{ book_review['rating'] }}/5</small>
+                    </li>
+                    
+                </ul> 
+
+                {% endfor %}
+            </p>
+
+            {% else %}
+
+            <p>
+                <h4>Write a review to be the first user to review this book!</h4>
+            </p>
+
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+   
+
+    
+    <!-- <img src="https://s.gr-assets.com/assets/press/logo-9a67f27d0b265fc757056c08b87d6299.jpg" alt="Goodreads"> -->
 
 {% endblock %}
 
 
-<!-- <div>Ratings count: {{ review_data['books']['ratings_count'] }}</div> -->
+
+
+
 
 
 
