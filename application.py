@@ -27,6 +27,7 @@ db = SQLAlchemy(app)
 #My config using SQLAlchemy:
 
 # engine = create_engine(os.getenv("DATABASE_URL"))
+# db = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 # db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 # Set up database - provided in harvard starter code project 1 - CAUSES ERROR
@@ -42,6 +43,7 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+
 # Configure flask login
 login = LoginManager(app)
 login.init_app(app)
@@ -54,23 +56,27 @@ def load_user(id):
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    reg_form = RegistrationForm()
+    if current_user.is_authenticated:
+        return redirect(url_for('search'))
+    else:
 
-    #if the validation is successful updates the database
-    if reg_form.validate_on_submit():
-        username = reg_form.username.data
-        password = reg_form.password.data
+        reg_form = RegistrationForm()
 
-        #Hash password
-        hashed_password = pbkdf2_sha256.hash(password)
+        #if the validation is successful updates the database
+        if reg_form.validate_on_submit():
+            username = reg_form.username.data
+            password = reg_form.password.data
 
-        db.session.execute("INSERT INTO users (username, password) VALUES (:username, :password)",\
-             {"username": username, "password" : hashed_password})
-        db.session.commit()
+            #Hash password
+            hashed_password = pbkdf2_sha256.hash(password)
 
-        return redirect(url_for('login'))
+            db.session.execute("INSERT INTO users (username, password) VALUES (:username, :password)",\
+                {"username": username, "password" : hashed_password})
+            db.session.commit()
 
-    return render_template("index.html", form=reg_form)
+            return redirect(url_for('login'))
+
+        return render_template("index.html", form=reg_form)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -83,15 +89,6 @@ def login():
         user_object = User.query.filter_by(username=login_form.username.data).first()
         login_user(user_object)
         return redirect(url_for('search'))
-
-    #Allow login if validation is successful - ERROR
-    # username = login_form.username.data
-       
-    # if login_form.validate_on_submit():
-    #     user_object = db.session.execute("SELECT * FROM users WHERE username = :username",\
-    #  {"username": username}).fetchone()
-    #     login_user(user_object)
-    #     return redirect(url_for('search'))
 
     return render_template("login.html", form=login_form)
 
@@ -114,19 +111,11 @@ def search_results(search):
     search_string = string.capwords(search.data['search'], sep = None)
 
     if search_string:
-        # qry = db_session.query(Book).filter((Book.title.contains(search_string)) | \
-        # (Book.author.contains(search_string)) | (Book.year.contains(search_string)) |\
-        #  (Book.isbn.contains(search_string)))
-        # qry = db.session.query(Book).filter((Book.title.contains(search_string)) |\
-        #  (Book.author.contains(search_string)) | (Book.year.contains(search_string)) |\
-        #  (Book.isbn.contains(search_string)))
-        # results = qry.order_by(Book.author.asc()).all()
 
         results = db.session.execute("SELECT isbn, author, title, year FROM books \
             WHERE isbn iLIKE '%"+search_string+"%' OR author iLIKE '%"+search_string+"%'\
                  OR title iLIKE '%"+search_string+"%' OR year iLIKE '%"+search_string+"%'\
                       ORDER BY author").fetchall()
-        # results = qry.order_by(Book.author.asc()).all() 
           
 
     else:
@@ -222,18 +211,18 @@ def display_book_json(isbn):
                     FROM reviews INNER JOIN books ON reviews.book_id = books.id WHERE books.isbn = :isbn \
                         GROUP BY title, author, year, isbn", {"isbn": isbn}).fetchone()
             
-            
-            book_dict = dict(book_query)
-
-            book_dict['average_score'] = float(book_dict['average_score'])
-
-            book_json = jsonify(book_dict)
-
             if book_query:
+
+                book_dict = dict(book_query)
+
+                book_dict['average_score'] = float(book_dict['average_score'])
+
+                book_json = jsonify(book_dict)
+            
                 return book_json
 
             else:
-                return render_template("error.html", message="Uh oh! Error 404. No results found.")
+                return render_template("error.html", message="Uh oh! Error 404. No results found. Either it's an invalid ISBN or we have no review data for that book.")
             
 
 @app.route("/logout", methods=['GET'])
@@ -248,3 +237,4 @@ def logout():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    session.permanent = False

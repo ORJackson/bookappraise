@@ -2,30 +2,56 @@
 $offWhite:  #FFFFFF;
 $gr_brown: #553B08;
 
-body {
-    background-color: $offWhite;
+
+h2 {
+    font-weight: bold;
 }
 
-/* styles the navigation bar */
-.topnav {
+body {
+    background-color: $offWhite;
+    background-image: url(../images/books.JPG);
+    color: $offWhite;
+}
+
+nav {
     background-color: $gr_brown;
-    overflow: hidden;
-    opacity: 0.9;
-    a {
-        float: left;
-        color: $offWhite;
-        text-align: center;
-        padding: 14px 16px;
-        text-decoration: none;
-        font-size: 17px;
-        &:hover {
-            background-color: $offWhite;
-            color: $gr_brown;
-        }
-        &.active{
-            background-color: $offWhite;
-            color: $gr_brown;
-        }
+}
+
+.reviews {
+    color: black;
+}
+
+.centre {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    div {
+        display: block;
     }
 }
 
+.text-link {
+    color: hotpink;
+}
+
+.alert {
+    background-color: hotpink;
+    color: $offWhite;
+    border: none;
+    text-align: center;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+input[type=submit] {
+    border-radius: 5px;
+    background-color: $offWhite;
+    color: hotpink;
+    border: none;
+    &:hover {
+        background-color: hotpink;
+        color: $offWhite;
+    }
+}

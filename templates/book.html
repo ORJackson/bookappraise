@@ -48,8 +48,6 @@ Book Info: {{book_info['title']}}
         </div>
     </form>
     
-  
-
     <div class ="row">
         <div class ="col-12">
 
@@ -60,7 +58,7 @@ Book Info: {{book_info['title']}}
 
                 {% for book_review in user_reviews %}
 
-                <ul class ="list-group">
+                <ul class ="reviews list-group">
                     <li class ="list-group-item ">
                         <div class="d-flex w-100 justify-content-between">
                             <h6 class="mb-1">{{ book_review['username'] }}</h6>
@@ -86,10 +84,6 @@ Book Info: {{book_info['title']}}
     </div>
 </div>
 
-   
-
-    
-    <!-- <img src="https://s.gr-assets.com/assets/press/logo-9a67f27d0b265fc757056c08b87d6299.jpg" alt="Goodreads"> -->
 
 {% endblock %}
 

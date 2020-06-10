@@ -20,6 +20,7 @@ class Book(db.Model):
     author = db.Column(db.String)
     year = db.Column(db.String)
 
+
 # class Review(db.Model):
 #     """ Review Model """
 

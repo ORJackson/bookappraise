@@ -5,7 +5,37 @@
 {% block title %} Home {% endblock %}
 
 {% block content %}
-    <h4>Welcome to bookAPPraise! Please register or login if you have an account.</h4>
+
+<div class="centre">
+    <div class="col-12">
+        <div class="row">
+            <h2>Welcome to bookAPPraise! </h2>
+        </div>
+        <div class="row">
+            <h4> Please register or <a href="/login" class="text-link">login</a> if you have an account.</h4>
+        </div>
+        <form action="{{ url_for('index') }}", method = "POST">
+            <div class="row">
+                {{ displayField(form.username, 'Username', autocomplete="off", autofocus=true)}}
+            </div>
+            <div class="row">
+                {{ displayField(form.password, 'Password')}}
+            </div>
+            <div class="row">
+                {{ displayField(form.confirm_password, 'Retype Password')}}
+            </div>
+            <div>
+                {{ form.submit_button }}
+            </div>
+            <div class="row">
+                {{ form.csrf_token }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+<!-- <h4>Welcome to bookAPPraise! Please register or <a href="/login">login</a> if you have an account.</h4>
 
     <form action="{{ url_for('index') }}", method = "POST">
         
@@ -18,5 +48,4 @@
         </div>
 
         {{ form.csrf_token }}
-    </form>
-{% endblock %}
+    </form> -->

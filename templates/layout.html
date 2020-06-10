@@ -5,22 +5,47 @@
         <title>{% block title %}{% endblock %} - bookAPPraise</title> 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../static/styles/styles.css">
+        
     </head>
     <body>
-        <nav>
-            <div class="topnav">
-                    <!-- <a class="active" href="index.html">bookAPPraise</a> -->
-                    <a href="/">bookAPPraise</a>
-                    {% if current_user.is_authenticated %}
-                        <a href="/search">search</a>
-                        <a href="/logout">logOut</a>
-                        <a class="user">{{current_user.username}}</a>
-                    {% else %}
-                        <a href="/login">logIn</a>
-                    {% endif %}
-            </div>
-        </nav>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+            {% if current_user.is_authenticated %}
+            {% else %}
+            {% endif %}
+
+            <a class="navbar-brand" href="/">BookAPPraise</a>
+            
+            {% if current_user.is_authenticated %}
+
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/search">Search</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="navbar-brand"><i class="fa fa-user"></i> {{current_user.username}} </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " href="/logout">logOut</a>
+                </li>
+            </ul>
+
+            {% else %}
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Login</a>
+                </li>
+            </ul>
+
+            {% endif %}
+
+          </nav>
+
         <div class="row">
             <!-- enable "No results found message" to flash on screen -->
             {% with messages = get_flashed_messages() %}
@@ -31,12 +56,13 @@
                 {% endif %}
             {% endwith %}
         </div>
-        <main class="container p-5">
-            {% block content %}
-            {% endblock %}
+        <main>
+                <div class="container h-100 p-5 align-items-center">
+                    {% block content %}
+                    {% endblock %}
+                </div>
         </main>
     </body>
 
 </html>
-
 
