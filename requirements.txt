@@ -9,3 +9,4 @@ python-dotenv
 flask_table
 requests
 gunicorn
+Flask-SQLAlchemy
