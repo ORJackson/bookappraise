@@ -1,17 +1,11 @@
 import os
-
 from flask import Flask, session, render_template, redirect, url_for, request, flash, jsonify
 from flask_session import Session
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import scoped_session, sessionmaker
 from flask_login import LoginManager, login_user, current_user, logout_user
-
 from flask_sqlalchemy import SQLAlchemy 
-
 from wtform_fields import *
 from models import *
 from tables import Results
-
 import string
 import requests
 
@@ -20,39 +14,26 @@ import requests
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', None)
 
-# Configure database - using Flask-SQLAlchemy
+# Configure database 
 app.config['SQLALCHEMY_DATABASE_URI']= os.getenv('DATABASE_URL')
 db = SQLAlchemy(app)
 
-#My config using SQLAlchemy:
-
-# engine = create_engine(os.getenv("DATABASE_URL"))
-# db = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
-# db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
-
-# Set up database - provided in harvard starter code project 1 - CAUSES ERROR
-# engine = create_engine(os.getenv("DATABASE_URL"))
-# db = scoped_session(sessionmaker(bind=engine))
-
-# Check for environment variable - provided in harvard starter code project 1
+# Check for environment variable
 if not os.getenv("DATABASE_URL"):
     raise RuntimeError("DATABASE_URL is not set")
 
-# Configure session to use filesystem - provided in harvard starter code project 1
+# Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-
 
 # Configure flask login
 login = LoginManager(app)
 login.init_app(app)
 
-
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
-
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -78,10 +59,8 @@ def index():
 
         return render_template("index.html", form=reg_form)
 
-
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-
     login_form = LoginForm()
 
     # Allow login if validation is successful
@@ -91,7 +70,6 @@ def login():
         return redirect(url_for('search'))
 
     return render_template("login.html", form=login_form)
-
 
 @app.route("/search", methods=['GET', 'POST'])
 def search():
@@ -104,19 +82,16 @@ def search():
 
     return render_template("search.html", form=search)
 
-
 @app.route('/results', methods=['GET'])
 def search_results(search):
     results = []
     search_string = string.capwords(search.data['search'], sep = None)
 
     if search_string:
-
         results = db.session.execute("SELECT isbn, author, title, year FROM books \
             WHERE isbn iLIKE '%"+search_string+"%' OR author iLIKE '%"+search_string+"%'\
                  OR title iLIKE '%"+search_string+"%' OR year iLIKE '%"+search_string+"%'\
                       ORDER BY author").fetchall()
-          
 
     else:
         results = db.session.execute("SELECT * FROM books ORDER BY year")
@@ -130,7 +105,6 @@ def search_results(search):
         table.border = True
         return render_template('results.html', table=table)
 
-
 @app.route('/book/<isbn>', methods=['GET', 'POST'])
 def display_info(isbn):
     review = BookReviewForm(request.form)
@@ -141,7 +115,6 @@ def display_info(isbn):
         return render_template("please_login.html")
     else:
         if request.method == 'GET':
-
             row = db.session.execute("SELECT isbn, title, author, year FROM books WHERE \
                             isbn = :isbn",
                             {"isbn": isbn})
@@ -150,12 +123,10 @@ def display_info(isbn):
             """USE GOODREADS API to get average rating and rating count"""
 
             key = os.getenv('GOODREADS_API_KEY')
-
             res = requests.get("https://www.goodreads.com/book/review_counts.json", params = {"key" : key, "isbns": isbn})
 
             if res.status_code != 200:
                 return render_template("error.html", message="API request unsuccessful.")
-            
             review_data = res.json()
 
             """Query database for user reviews"""
@@ -163,10 +134,9 @@ def display_info(isbn):
             user_reviews = db.session.execute("SELECT users.username, comment, rating, date FROM reviews \
                 INNER JOIN users ON reviews.user_id = users.id WHERE book_id = :book_id ORDER BY date DESC", \
                     {"book_id": book_id}).fetchall()
-
             return render_template("book.html", book_info = book_info, review_data = review_data, res = res, form = review, user_reviews = user_reviews)
 
-        """post a review"""
+        """Post a review"""
 
         if request.method == 'POST':
             
@@ -180,22 +150,17 @@ def display_info(isbn):
                  {"user_id": user_id, "book_id": book_id}).fetchone()
 
             if existing_review:
-
-                flash('You have already reviewed this book! You cannot post more than one review for the same book.')
-
+                flash('You cannot review the same book twice.')
                 return redirect('/book/' + isbn)
 
             else:
             
-                """If no review exists, post review"""
+                """If no review of this book exists from this user, post review"""
 
                 db.session.execute("INSERT INTO reviews (user_id, book_id, comment, rating, date) VALUES (:user_id, :book_id, :comment, :rating, CURRENT_DATE)", \
                     {"user_id" : user_id, "book_id" : book_id, "comment" : comment, "rating" : rating})
-
                 db.session.commit()
-
                 flash('Thanks for the review!')
-
                 return redirect('/book/' + isbn)
 
 @app.route('/api/<isbn>', methods=['GET'])
@@ -212,18 +177,13 @@ def display_book_json(isbn):
                         GROUP BY title, author, year, isbn", {"isbn": isbn}).fetchone()
             
             if book_query:
-
                 book_dict = dict(book_query)
-
                 book_dict['average_score'] = float(book_dict['average_score'])
-
                 book_json = jsonify(book_dict)
-            
                 return book_json
 
             else:
-                return render_template("error.html", message="Uh oh! Error 404. No results found. Either it's an invalid ISBN or we have no review data for that book.")
-            
+                return render_template("error.html", message="404. Uh oh! No results found. We have no review data for that book.")
 
 @app.route("/logout", methods=['GET'])
 def logout():
@@ -233,7 +193,6 @@ def logout():
 
     logout_user()
     return render_template("logout.html")
-
 
 if __name__ == "__main__":
     app.run(debug=True)

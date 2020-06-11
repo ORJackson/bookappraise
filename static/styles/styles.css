@@ -9,10 +9,6 @@ body {
   color: #FFFFFF;
 }
 
-nav {
-  background-color: #553B08;
-}
-
 .reviews {
   color: black;
 }
@@ -54,5 +50,19 @@ input[type=submit] {
 input[type=submit]:hover {
   background-color: hotpink;
   color: #FFFFFF;
+}
+
+.my_table {
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid #343A40;
+}
+
+.my_table th, .my_table td {
+  padding: 15px;
+}
+
+.my_table tr:hover {
+  background-color: #343A40;
 }
 /*# sourceMappingURL=styles.css.map */

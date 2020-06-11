@@ -47,6 +47,3 @@ class BookReviewForm(Form):
     review = TextAreaField('Text', render_kw={"rows": 5, "cols": 5}, validators=[InputRequired(message="Input required")])
     rating = SelectField('Rating', choices=[(5, 5), (4, 4), (3, 3), (2, 2), (1, 1)], validators=[InputRequired(message="You need to give the book a rating")])
 
-# class BookRatingForm(Form):
-#     """Select rating /5 Form - drop down"""
-#     rating = SelectField('Rating', choices=[(5, 5), (4, 4), (3, 3), (2, 2), (1, 1)])

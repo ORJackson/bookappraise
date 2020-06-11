@@ -21,13 +21,3 @@ class Book(db.Model):
     year = db.Column(db.String)
 
 
-# class Review(db.Model):
-#     """ Review Model """
-
-#     __tablename__ = "reviews"
-
-#     id = db.Column(db.Integer, primary_key=True)
-#     review = db.Column(db.String, nullable=False)
-#     rating = db.Column(db.Integer, nullable=False)
-#     user_id = db.Column(db.Integer, ForeignKey('public.users.id'), nullable=False)
-#     book_id = db.Column(db.Integer, ForeignKey('public.books.id'), nullable=False)

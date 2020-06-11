@@ -4,6 +4,7 @@ from models import Book
 # Table for displaying search results
 
 class Results(Table):
+    classes = ['my_table']
     id = Col('Id', show=False)
     isbn = Col('ISBN')
     title = Col('Title')

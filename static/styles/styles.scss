@@ -1,7 +1,5 @@
 /*Stylesheet*/
 $offWhite:  #FFFFFF;
-$gr_brown: #553B08;
-
 
 h2 {
     font-weight: bold;
@@ -11,10 +9,6 @@ body {
     background-color: $offWhite;
     background-image: url(../images/books.JPG);
     color: $offWhite;
-}
-
-nav {
-    background-color: $gr_brown;
 }
 
 .reviews {
@@ -53,5 +47,17 @@ input[type=submit] {
     &:hover {
         background-color: hotpink;
         color: $offWhite;
+    }
+}
+
+.my_table {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #343A40;
+    th, td {
+        padding: 15px;
+    }
+    tr:hover {
+        background-color: #343A40;
     }
 }
