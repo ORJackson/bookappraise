@@ -2,7 +2,7 @@ Flask
 Flask-Session
 psycopg2-binary
 SQLAlchemy
-Werkzeug 0.16.0
+Werkzeug
 passlib
 flask_login
 python-dotenv
