@@ -8,3 +8,4 @@ flask_login
 python-dotenv
 flask_table
 requests
+gunicorn
