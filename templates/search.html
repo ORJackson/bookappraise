@@ -23,39 +23,11 @@
         <div class="row">
             <div>
                 e.g. "The Magus", "John Fowles", "1965", or "0316296198"
-                <br> (Searches are not case sensitive)
+                <br>
+                <br> Not sure what you're looking for? Just click search to see the full list of books.
             </div>
         </div>
     </div>
 </div>
 
 {% endblock %}
-
-<h2>Let's get searching</h2>
-
-    <form method="POST">
-        <p>
-        {{ displayField(form.search, "Search here")}}
-        </p>
-        <p><input type="submit" value="Click me to search!">
-        </p>
-    </form>
-
-    <div>
-        <p>e.g. "The Magus", "John Fowles", "1965", or "0316296198"</p>
-        <br>
-        <p> (Searches are not case sensitive)</p>
-        <br> 
-        <p> Not sure what you're looking for? Just hit search to see the full list of books.</p>
-    </div>
-
-    <!-- enable "No results found message" to flash on screen -->
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
