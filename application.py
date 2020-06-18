@@ -109,6 +109,8 @@ def search_results(search):
 def display_info(isbn):
     review = BookReviewForm(request.form)
     book_row = db.session.execute("SELECT id FROM books WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
+    if book_row is None:
+        return render_template("error.html", message="404. Uh oh! No results found.")
     book_id = book_row['id']
 
     if not current_user.is_authenticated:
